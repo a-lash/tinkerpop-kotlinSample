@@ -20,6 +20,7 @@ import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
+import com.mongodb.client.model.Filters
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Edge
@@ -57,7 +58,10 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun edges(vararg edgeIds: Any?): MutableIterator<Edge> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return edges.find(Filters.`in`("_id", edgeIds)).
+                map {
+                    MongoEdge()
+                }.iterator()
     }
 
     override fun addVertex(vararg keyValues: Any?): Vertex {
@@ -80,7 +84,10 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun vertices(vararg vertexIds: Any?): MutableIterator<Vertex> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return vertices.find(Filters.`in`("_id", vertexIds)).
+                map {
+                   MongoVertex()
+                }.iterator()
     }
 
     override fun close() {

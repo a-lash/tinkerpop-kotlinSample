@@ -16,17 +16,13 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
-import org.apache.tinkerpop.gremlin.structure.*
+import org.apache.tinkerpop.gremlin.structure.Direction
+import org.apache.tinkerpop.gremlin.structure.Edge
+import org.apache.tinkerpop.gremlin.structure.Property
+import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.bson.Document
 
-class MongoEdge : Edge {
-    override fun id(): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun graph(): Graph {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
+class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, graph), Edge {
     override fun <V : Any?> property(key: String?, value: V): Property<V> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -40,10 +36,6 @@ class MongoEdge : Edge {
     }
 
     override fun vertices(direction: Direction?): MutableIterator<Vertex> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun label(): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

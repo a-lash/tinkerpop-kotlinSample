@@ -16,10 +16,20 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
+import com.mongodb.client.model.Filters
 import org.apache.tinkerpop.gremlin.structure.*
+import org.bson.Document
 
-class MongoVertex : Vertex {
+class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
     override fun edges(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Edge> {
+        // TODO what is direction for? Labels?
+        return graph.db.getCollection("edges")
+                .find(Filters.`in`(T.label.accessor, edgeLabels))
+                .map { MongoEdge(it, graph) }
+                .iterator()
+    }
+
+    override fun remove() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -27,19 +37,7 @@ class MongoVertex : Vertex {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun id(): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun graph(): Graph {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
     override fun <V : Any?> property(cardinality: VertexProperty.Cardinality?, key: String?, value: V, vararg keyValues: Any?): VertexProperty<V> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun remove() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -48,10 +46,6 @@ class MongoVertex : Vertex {
     }
 
     override fun vertices(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Vertex> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun label(): String {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

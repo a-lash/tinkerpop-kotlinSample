@@ -18,30 +18,29 @@ package com.mongodb.mongopop.gremlin.structure
 
 import org.apache.tinkerpop.gremlin.structure.Element
 import org.apache.tinkerpop.gremlin.structure.Graph
-import org.apache.tinkerpop.gremlin.structure.Property
+import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.structure.util.ElementHelper
+import org.bson.Document
 
-class MongoElement : Element {
-    override fun id(): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+abstract class MongoElement protected constructor(protected val document: Document, protected val graph: MongoGraph) : Element {
 
     override fun graph(): Graph {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return graph
     }
 
-    override fun <V : Any?> property(key: String?, value: V): Property<V> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun remove() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<Property<V>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun id(): Any {
+        return this.document.get("_id")!!
     }
 
     override fun label(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return document.getString(T.label.accessor)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return ElementHelper.areEqual(this, other)
+    }
+
+    override fun hashCode(): Int {
+        return ElementHelper.hashCode(this)
     }
 }

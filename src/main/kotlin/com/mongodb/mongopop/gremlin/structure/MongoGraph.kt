@@ -20,6 +20,8 @@ import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
+import com.mongodb.client.MongoDatabase
+import com.mongodb.client.model.Filters
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Edge
@@ -37,12 +39,13 @@ class MongoGraph(val conf: Configuration) : Graph {
     private val client: MongoClient
     private val vertices: MongoCollection<Document>
     private val edges: MongoCollection<Document>
+    internal val db: MongoDatabase
     private val variables: TinkerGraphVariables
 
     init {
         val url = ConnectionString(conf.getString("connectionUrl"))
         client = MongoClients.create(url)
-        val db = client.getDatabase(url.database!!)
+        db = client.getDatabase(url.database!!)
         vertices = db.getCollection("vertices")
         edges = db.getCollection("edges")
         variables = TinkerGraphVariables()
@@ -57,7 +60,10 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun edges(vararg edgeIds: Any?): MutableIterator<Edge> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return edges.find(Filters.`in`("_id", edgeIds)).
+                map {
+                    MongoEdge(it, this)
+                }.iterator()
     }
 
     override fun addVertex(vararg keyValues: Any?): Vertex {
@@ -68,7 +74,7 @@ class MongoGraph(val conf: Configuration) : Graph {
         }
         vertices.insertOne(d)
 
-        return MongoVertex()
+        return MongoVertex(d, this)
     }
 
     override fun configuration(): Configuration {
@@ -80,7 +86,10 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun vertices(vararg vertexIds: Any?): MutableIterator<Vertex> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return vertices.find(Filters.`in`("_id", vertexIds)).
+                map {
+                   MongoVertex(it, this)
+                }.iterator()
     }
 
     override fun close() {

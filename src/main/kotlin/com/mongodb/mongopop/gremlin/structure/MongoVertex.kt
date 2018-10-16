@@ -16,15 +16,17 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
-import org.apache.tinkerpop.gremlin.structure.Direction
-import org.apache.tinkerpop.gremlin.structure.Edge
-import org.apache.tinkerpop.gremlin.structure.Vertex
-import org.apache.tinkerpop.gremlin.structure.VertexProperty
+import com.mongodb.client.model.Filters
+import org.apache.tinkerpop.gremlin.structure.*
 import org.bson.Document
 
 class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
     override fun edges(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Edge> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // TODO what is direction for? Labels?
+        return graph.db.getCollection("edges")
+                .find(Filters.`in`(T.label.accessor, edgeLabels))
+                .map { MongoEdge(it, graph) }
+                .iterator()
     }
 
     override fun addEdge(label: String?, inVertex: Vertex?, vararg keyValues: Any?): Edge {

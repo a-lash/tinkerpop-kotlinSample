@@ -22,7 +22,7 @@ import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper
 import org.bson.Document
 
-abstract class MongoElement protected constructor(protected val document: Document, protected val graph: Graph) : Element {
+abstract class MongoElement protected constructor(protected val document: Document, protected val graph: MongoGraph) : Element {
 
     override fun graph(): Graph {
         return graph

@@ -39,7 +39,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     private val client: MongoClient
     private val vertices: MongoCollection<Document>
     private val edges: MongoCollection<Document>
-    private var db: MongoDatabase
+    internal val db: MongoDatabase
     private val variables: TinkerGraphVariables
 
     init {

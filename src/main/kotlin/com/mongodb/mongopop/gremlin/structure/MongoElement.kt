@@ -17,16 +17,23 @@
 package com.mongodb.mongopop.gremlin.structure
 
 import org.apache.tinkerpop.gremlin.structure.Element
+import org.apache.tinkerpop.gremlin.structure.Graph
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper
+import org.bson.Document
 
-abstract class MongoElement protected constructor(val id: Any, val label: String) : Element {
+abstract class MongoElement protected constructor(protected val document: Document, protected val graph: Graph) : Element {
+
+    override fun graph(): Graph {
+        return graph
+    }
 
     override fun id(): Any {
-        return this.id
+        return this.document.get("_id")!!
     }
 
     override fun label(): String {
-        return this.label
+        return document.getString(T.label.accessor)
     }
 
     override fun equals(other: Any?): Boolean {

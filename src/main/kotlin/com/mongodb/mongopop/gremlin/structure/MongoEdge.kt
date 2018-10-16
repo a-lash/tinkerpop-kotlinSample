@@ -17,12 +17,9 @@
 package com.mongodb.mongopop.gremlin.structure
 
 import org.apache.tinkerpop.gremlin.structure.*
+import org.bson.Document
 
-class MongoEdge : Edge {
-    override fun id(): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
+class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, graph), Edge {
     override fun graph(): Graph {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

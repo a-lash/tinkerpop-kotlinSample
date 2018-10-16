@@ -62,7 +62,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     override fun edges(vararg edgeIds: Any?): MutableIterator<Edge> {
         return edges.find(Filters.`in`("_id", edgeIds)).
                 map {
-                    MongoEdge()
+                    MongoEdge(it, this)
                 }.iterator()
     }
 
@@ -74,7 +74,7 @@ class MongoGraph(val conf: Configuration) : Graph {
         }
         vertices.insertOne(d)
 
-        return MongoVertex()
+        return MongoVertex(d, this)
     }
 
     override fun configuration(): Configuration {
@@ -88,7 +88,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     override fun vertices(vararg vertexIds: Any?): MutableIterator<Vertex> {
         return vertices.find(Filters.`in`("_id", vertexIds)).
                 map {
-                   MongoVertex()
+                   MongoVertex(it, this)
                 }.iterator()
     }
 

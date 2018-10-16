@@ -37,8 +37,8 @@ import org.bson.Document
 @GraphFactoryClass(MongoGraph.MongoGraphFactory::class)
 class MongoGraph(val conf: Configuration) : Graph {
     private val client: MongoClient
-    private val vertices: MongoCollection<Document>
-    private val edges: MongoCollection<Document>
+    internal val vertices: MongoCollection<Document>
+    internal val edges: MongoCollection<Document>
     internal val db: MongoDatabase
     private val variables: TinkerGraphVariables
 

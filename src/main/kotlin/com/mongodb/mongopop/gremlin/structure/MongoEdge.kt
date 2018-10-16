@@ -16,6 +16,11 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
+import com.mongodb.client.MongoCollection
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.FindOneAndUpdateOptions
+import com.mongodb.client.model.ReturnDocument
+import com.mongodb.client.model.Updates
 import org.apache.tinkerpop.gremlin.structure.Direction
 import org.apache.tinkerpop.gremlin.structure.Edge
 import org.apache.tinkerpop.gremlin.structure.Property
@@ -23,13 +28,8 @@ import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.bson.Document
 
 class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, graph), Edge {
-    override fun <V : Any?> property(key: String?, value: V): Property<V> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun remove() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override val collection: MongoCollection<Document>
+        get() = graph.edges
 
     override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<Property<V>> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -37,5 +37,13 @@ class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, 
 
     override fun vertices(direction: Direction?): MutableIterator<Vertex> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun <V : Any?> property(key: String?, value: V): Property<V> {
+        // TODO: REALLY!!!???
+        document = collection.findOneAndUpdate(Filters.eq(document.get("_id")),
+                Updates.set(key!!, value),
+                FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))!!
+        return MongoProperty<V>() // TODO
     }
 }

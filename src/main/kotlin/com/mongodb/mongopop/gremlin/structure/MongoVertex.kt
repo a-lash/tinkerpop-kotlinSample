@@ -16,17 +16,37 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
+import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.Filters
-import org.apache.tinkerpop.gremlin.structure.*
+import com.mongodb.client.model.FindOneAndUpdateOptions
+import com.mongodb.client.model.ReturnDocument
+import com.mongodb.client.model.Updates
+import org.apache.tinkerpop.gremlin.structure.Direction
+import org.apache.tinkerpop.gremlin.structure.Edge
+import org.apache.tinkerpop.gremlin.structure.T
+import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import org.bson.Document
 
 class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
+
+    override val collection: MongoCollection<Document>
+        get() = graph.vertices
+
     override fun edges(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Edge> {
         // TODO what is direction for? Labels?
         return graph.db.getCollection("edges")
                 .find(Filters.`in`(T.label.accessor, edgeLabels))
                 .map { MongoEdge(it, graph) }
                 .iterator()
+    }
+
+    override fun <V : Any?> property(key: String?, value: V): VertexProperty<V> {
+        // TODO: REALLY!!!???
+        document = collection.findOneAndUpdate(Filters.eq(document.get("_id")),
+                Updates.set(key!!, value),
+                FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))!!
+        return MongoVertexProperty<V>()
     }
 
     override fun remove() {

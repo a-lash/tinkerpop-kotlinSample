@@ -16,13 +16,17 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
+import com.mongodb.client.MongoCollection
+import com.mongodb.client.model.Filters
 import org.apache.tinkerpop.gremlin.structure.Element
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper
 import org.bson.Document
 
-abstract class MongoElement protected constructor(protected val document: Document, protected val graph: MongoGraph) : Element {
+abstract class MongoElement protected constructor(protected var document: Document, protected val graph: MongoGraph) : Element {
+
+    abstract val collection : MongoCollection<Document>
 
     override fun graph(): Graph {
         return graph
@@ -34,6 +38,10 @@ abstract class MongoElement protected constructor(protected val document: Docume
 
     override fun label(): String {
         return document.getString(T.label.accessor)
+    }
+
+    override fun remove() {
+        collection.deleteOne(Filters.eq(document.get("_id")))
     }
 
     override fun equals(other: Any?): Boolean {

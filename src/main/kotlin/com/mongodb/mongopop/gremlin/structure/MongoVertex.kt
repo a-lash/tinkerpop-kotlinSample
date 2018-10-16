@@ -34,7 +34,16 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     }
 
     override fun addEdge(label: String?, inVertex: Vertex?, vararg keyValues: Any?): Edge {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val d = Document()
+        keyValues.asList().chunked(2).forEach {
+            val key = it[0] as String
+            d.append(if (key == T.id.accessor) "_id" else key, it[1])
+        }
+        d.set(T.label.accessor, label)
+        d.set("inVertex", inVertex!!.id())
+        d.set("outVertex", this.id())
+        graph.db.getCollection("edges").insertOne(d)
+        return MongoEdge(d, graph)
     }
 
     override fun <V : Any?> property(cardinality: VertexProperty.Cardinality?, key: String?, value: V, vararg keyValues: Any?): VertexProperty<V> {

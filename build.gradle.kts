@@ -8,7 +8,9 @@ application {
 }
 
 dependencies {
-    compile(kotlin("stdlib"))
+    api(kotlin("stdlib"))
+
+    api("org.apache.tinkerpop:tinkergraph-gremlin:3.3.3")
 }
 
 repositories {

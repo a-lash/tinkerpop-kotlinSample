@@ -29,15 +29,15 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
                 .iterator()
     }
 
+    override fun remove() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun addEdge(label: String?, inVertex: Vertex?, vararg keyValues: Any?): Edge {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun <V : Any?> property(cardinality: VertexProperty.Cardinality?, key: String?, value: V, vararg keyValues: Any?): VertexProperty<V> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun remove() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -48,5 +48,4 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     override fun vertices(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Vertex> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
 }

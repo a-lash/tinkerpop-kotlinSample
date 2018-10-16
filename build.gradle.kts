@@ -10,6 +10,7 @@ application {
 dependencies {
     api(kotlin("stdlib"))
 
+    api("org.mongodb:mongodb-driver-sync:3.8.2")
     api("org.apache.tinkerpop:tinkergraph-gremlin:3.3.3")
 }
 

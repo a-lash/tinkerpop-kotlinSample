@@ -24,9 +24,11 @@ import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Edge
 import org.apache.tinkerpop.gremlin.structure.Graph
+import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.Transaction
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactoryClass
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraphVariables
 import org.bson.Document
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
@@ -35,6 +37,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     private val client: MongoClient
     private val vertices: MongoCollection<Document>
     private val edges: MongoCollection<Document>
+    private val variables: TinkerGraphVariables
 
     init {
         val url = ConnectionString(conf.getString("connectionUrl"))
@@ -42,6 +45,7 @@ class MongoGraph(val conf: Configuration) : Graph {
         val db = client.getDatabase(url.database!!)
         vertices = db.getCollection("vertices")
         edges = db.getCollection("edges")
+        variables = TinkerGraphVariables()
     }
 
     override fun <C : GraphComputer?> compute(graphComputerClass: Class<C>?): C {
@@ -58,7 +62,10 @@ class MongoGraph(val conf: Configuration) : Graph {
 
     override fun addVertex(vararg keyValues: Any?): Vertex {
         val d = Document()
-        keyValues.asList().chunked(2).forEach {d.append(it[0] as String?, it[1])}
+        keyValues.asList().chunked(2).forEach {
+            val key = it[0] as String
+            d.append(if (key == T.id.accessor) "_id" else key, it[1])
+        }
         vertices.insertOne(d)
 
         return MongoVertex()
@@ -69,7 +76,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun variables(): Graph.Variables {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return variables
     }
 
     override fun vertices(vararg vertexIds: Any?): MutableIterator<Vertex> {

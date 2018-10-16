@@ -16,15 +16,34 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
+import com.mongodb.ConnectionString
+import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoClients
+import com.mongodb.client.MongoCollection
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Edge
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.structure.Transaction
 import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.apache.tinkerpop.gremlin.structure.util.GraphFactoryClass
+import org.bson.Document
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
-class MongoGraph : Graph {
+@GraphFactoryClass(MongoGraph.MongoGraphFactory::class)
+class MongoGraph(val conf: Configuration) : Graph {
+    private val client: MongoClient
+    private val vertices: MongoCollection<Document>
+    private val edges: MongoCollection<Document>
+
+    init {
+        val url = ConnectionString(conf.getString("connectionUrl"))
+        client = MongoClients.create(url)
+        val db = client.getDatabase(url.database!!)
+        vertices = db.getCollection("vertices")
+        edges = db.getCollection("edges")
+    }
+
     override fun <C : GraphComputer?> compute(graphComputerClass: Class<C>?): C {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -38,11 +57,15 @@ class MongoGraph : Graph {
     }
 
     override fun addVertex(vararg keyValues: Any?): Vertex {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val d = Document()
+        keyValues.asList().chunked(2).forEach {d.append(it[0] as String?, it[1])}
+        vertices.insertOne(d)
+
+        return MongoVertex()
     }
 
     override fun configuration(): Configuration {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return conf
     }
 
     override fun variables(): Graph.Variables {
@@ -54,10 +77,17 @@ class MongoGraph : Graph {
     }
 
     override fun close() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        client.close()
     }
 
     override fun tx(): Transaction {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    object MongoGraphFactory {
+        fun open(conf: Configuration): Graph {
+            return MongoGraph(conf)
+        }
+    }
+
 }

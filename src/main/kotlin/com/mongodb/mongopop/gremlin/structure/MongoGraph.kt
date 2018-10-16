@@ -23,6 +23,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.structure.Transaction
 import org.apache.tinkerpop.gremlin.structure.Vertex
 
+@Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
 class MongoGraph : Graph {
     override fun <C : GraphComputer?> compute(graphComputerClass: Class<C>?): C {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.

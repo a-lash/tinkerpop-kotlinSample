@@ -16,18 +16,15 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
+import com.mongodb.client.MongoDatabase
 import org.apache.tinkerpop.gremlin.structure.*
 
-class MongoVertex : Vertex {
+class MongoVertex(id: Any, label: String, val db: MongoDatabase) : MongoElement(id, label), Vertex {
     override fun edges(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Edge> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun addEdge(label: String?, inVertex: Vertex?, vararg keyValues: Any?): Edge {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun id(): Any {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -51,7 +48,4 @@ class MongoVertex : Vertex {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun label(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
 }

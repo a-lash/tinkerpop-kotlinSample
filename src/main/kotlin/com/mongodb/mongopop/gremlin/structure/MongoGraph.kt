@@ -20,6 +20,7 @@ import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
+import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
@@ -38,12 +39,13 @@ class MongoGraph(val conf: Configuration) : Graph {
     private val client: MongoClient
     private val vertices: MongoCollection<Document>
     private val edges: MongoCollection<Document>
+    private var db: MongoDatabase
     private val variables: TinkerGraphVariables
 
     init {
         val url = ConnectionString(conf.getString("connectionUrl"))
         client = MongoClients.create(url)
-        val db = client.getDatabase(url.database!!)
+        db = client.getDatabase(url.database!!)
         vertices = db.getCollection("vertices")
         edges = db.getCollection("edges")
         variables = TinkerGraphVariables()

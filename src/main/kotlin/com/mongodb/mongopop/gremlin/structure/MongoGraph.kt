@@ -31,6 +31,7 @@ import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactoryClass
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraphVariables
 import org.bson.Document
+import org.bson.types.ObjectId
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
 @GraphFactoryClass(MongoGraph.MongoGraphFactory::class)
@@ -81,7 +82,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun vertices(vararg vertexIds: Any?): MutableIterator<Vertex> {
-        val ids = vertexIds.asList().map { it.toString() }
+        val ids = vertexIds.asList().map { ObjectId(it.toString()) }
         if (vertexIds.size == 0) {
             return vertices.find().map {
                 MongoVertex(it, this)

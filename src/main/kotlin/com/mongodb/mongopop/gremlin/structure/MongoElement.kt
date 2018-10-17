@@ -41,7 +41,7 @@ abstract class MongoElement protected constructor(protected var document: Docume
     }
 
     override fun label(): String? {
-        return document.getString(T.label.toString())
+        return document.getString("~label")
     }
 
     override fun remove() {

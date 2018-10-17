@@ -66,7 +66,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun addVertex(vararg keyValues: Any?): Vertex {
-        val mongoVertex = MongoVertex(this, keyValues)
+        val mongoVertex = MongoVertex(this, *keyValues)
         mongoVertex.save()
 
         return mongoVertex

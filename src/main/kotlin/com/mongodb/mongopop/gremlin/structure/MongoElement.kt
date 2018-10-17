@@ -40,8 +40,8 @@ abstract class MongoElement protected constructor(protected var document: Docume
         return this.document.get("_id")!!
     }
 
-    override fun label(): String {
-        return document.getString(T.label.accessor)
+    override fun label(): String? {
+        return document.getString(T.label.toString())
     }
 
     override fun remove() {

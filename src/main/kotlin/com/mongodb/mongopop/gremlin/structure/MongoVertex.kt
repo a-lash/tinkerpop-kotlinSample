@@ -21,18 +21,13 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.ReturnDocument
 import com.mongodb.client.model.Updates
-import org.apache.tinkerpop.gremlin.structure.Direction
-import org.apache.tinkerpop.gremlin.structure.Edge
-import org.apache.tinkerpop.gremlin.structure.T
-import org.apache.tinkerpop.gremlin.structure.Vertex
-import org.apache.tinkerpop.gremlin.structure.VertexProperty
+import org.apache.tinkerpop.gremlin.structure.*
 import org.bson.Document
-import org.litote.kmongo.findOneById
 
 class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
     constructor(graph: MongoGraph, vararg keyValues: Any?) : this(Document(), graph) {
         keyValues.asList().chunked(2).forEach {
-            val key = it[0] as String
+            val key = it[0].toString()
             document.append(if (key == T.id.accessor) "_id" else key, it[1])
         }
     }

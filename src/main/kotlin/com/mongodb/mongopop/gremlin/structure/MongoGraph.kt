@@ -81,7 +81,13 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun vertices(vararg vertexIds: Any?): MutableIterator<Vertex> {
-        return vertices.find(Filters.`in`("_id", vertexIds.toList())).
+        val ids = vertexIds.asList().map { it.toString() }
+        if (vertexIds.size == 0) {
+            return vertices.find().map {
+                MongoVertex(it, this)
+            }.iterator()
+        }
+        return vertices.find(Filters.`in`("_id", ids)).
                 map {
                    MongoVertex(it, this)
                 }.iterator()

@@ -1,16 +1,13 @@
 plugins {
-    application
     kotlin("jvm") version "1.2.71"
+    java
+    maven
 }
 
 val kotlinVersion: String by project
 val tinkerpopVersion: String by project
 val kmongoVersion: String by project
 val junitVersion: String by project
-
-application {
-    mainClassName = "samples.HelloWorldKt"
-}
 
 dependencies {
     api(kotlin("stdlib"))
@@ -26,3 +23,8 @@ repositories {
     jcenter()
     mavenCentral()
 }
+
+group = "com.mongodb.mongopop"
+version = "1.0.0"
+
+apply(plugin="maven")

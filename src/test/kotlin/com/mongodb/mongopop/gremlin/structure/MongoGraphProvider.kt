@@ -29,7 +29,9 @@ class MongoGraphProvider : AbstractGraphProvider() {
         val url = ConnectionString(configuration!!.getString("connectionUrl"))
         val client = MongoClients.create(url)
         val db = client.getDatabase(url.database!!)
-        db.drop()
+        for (collection in db.listCollectionNames()) {
+            db.getCollection(collection).drop()
+        }
     }
 
     override fun getImplementations(): MutableSet<Class<Any>> {

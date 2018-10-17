@@ -57,7 +57,7 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     }
 
     override fun addEdge(label: String?, inVertex: Vertex?, vararg keyValues: Any?): Edge {
-        val mongoEdge = MongoEdge(label, inVertex!!.id(), graph, keyValues)
+        val mongoEdge = MongoEdge(label, inVertex!!.id(), graph, *keyValues)
         mongoEdge.save()
 
         return mongoEdge

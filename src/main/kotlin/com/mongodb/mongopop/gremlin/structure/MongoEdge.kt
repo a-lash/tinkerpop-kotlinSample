@@ -21,13 +21,21 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.ReturnDocument
 import com.mongodb.client.model.Updates
-import org.apache.tinkerpop.gremlin.structure.Direction
-import org.apache.tinkerpop.gremlin.structure.Edge
-import org.apache.tinkerpop.gremlin.structure.Property
-import org.apache.tinkerpop.gremlin.structure.Vertex
+import org.apache.tinkerpop.gremlin.structure.*
 import org.bson.Document
 
 class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, graph), Edge {
+
+    constructor(label: String?, inVertex: Any, graph: MongoGraph, vararg keyValues: Any?): this(Document(), graph) {
+        keyValues.asList().chunked(2).forEach {
+            val key = it[0] as String
+            document.append(if (key == T.id.accessor) "_id" else key, it[1])
+        }
+        document.set(T.label.accessor, label)
+        document.set("inVertex", inVertex)
+        document.set("outVertex", this.id())
+
+    }
     override val collection: MongoCollection<Document>
         get() = graph.edges
 

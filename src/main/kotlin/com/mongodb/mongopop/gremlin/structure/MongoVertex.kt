@@ -27,16 +27,17 @@ import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 import org.bson.Document
+import org.litote.kmongo.findOneById
 
 class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
-
     override val collection: MongoCollection<Document>
         get() = graph.vertices
 
     override fun edges(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Edge> {
-        // TODO what is direction for? Labels?
-        return graph.db.getCollection("edges")
-                .find(Filters.`in`(T.label.accessor, edgeLabels))
+        // TODO direction
+        // TODO move to MongoEdge
+        return graph.edges
+                .find(Filters.and(Filters.eq("inVertex", this.id()), Filters.`in`(T.label.accessor, edgeLabels)))
                 .map { MongoEdge(it, graph) }
                 .iterator()
     }
@@ -50,20 +51,14 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     }
 
     override fun remove() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        collection.deleteOne(Filters.eq(document.get("_id")))
     }
 
     override fun addEdge(label: String?, inVertex: Vertex?, vararg keyValues: Any?): Edge {
-        val d = Document()
-        keyValues.asList().chunked(2).forEach {
-            val key = it[0] as String
-            d.append(if (key == T.id.accessor) "_id" else key, it[1])
-        }
-        d.set(T.label.accessor, label)
-        d.set("inVertex", inVertex!!.id())
-        d.set("outVertex", this.id())
-        graph.db.getCollection("edges").insertOne(d)
-        return MongoEdge(d, graph)
+        val mongoEdge = MongoEdge(label, inVertex!!.id(), graph, keyValues)
+        mongoEdge.save()
+
+        return mongoEdge
     }
 
     override fun <V : Any?> property(cardinality: VertexProperty.Cardinality?, key: String?, value: V, vararg keyValues: Any?): VertexProperty<V> {
@@ -71,7 +66,9 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     }
 
     override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<VertexProperty<V>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // TODO properties are horrible
+        TODO("not implemented")
+//        collection.findOneById(document.get("_id")!!).
     }
 
     override fun vertices(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Vertex> {

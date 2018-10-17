@@ -28,6 +28,10 @@ abstract class MongoElement protected constructor(protected var document: Docume
 
     abstract val collection : MongoCollection<Document>
 
+    fun save() {
+        collection.insertOne(document)
+    }
+
     override fun graph(): Graph {
         return graph
     }

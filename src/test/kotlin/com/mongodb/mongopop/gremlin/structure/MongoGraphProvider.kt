@@ -18,15 +18,18 @@ package com.mongodb.mongopop.gremlin.structure
 
 import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClients
+import com.mongodb.mongopop.gremlin.structure.MongoGraph.Companion.MONGODB_CONFIG_PREFIX
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.AbstractGraphProvider
 import org.apache.tinkerpop.gremlin.LoadGraphWith
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraphVariables
+import java.util.*
 
 class MongoGraphProvider : AbstractGraphProvider() {
+
     override fun clear(graph: Graph?, configuration: Configuration?) {
-        val url = ConnectionString(configuration!!.getString("connectionUrl"))
+        val url = ConnectionString(configuration!!.getString("$MONGODB_CONFIG_PREFIX.connectionUrl"))
         val client = MongoClients.create(url)
         val db = client.getDatabase(url.database!!)
         for (collection in db.listCollectionNames()) {
@@ -34,22 +37,27 @@ class MongoGraphProvider : AbstractGraphProvider() {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun getImplementations(): MutableSet<Class<Any>> {
         return mutableSetOf(
-                MongoEdge::class.java as Class<Any>,
-                MongoVertex::class.java as Class<Any>,
-                MongoElement::class.java as Class<Any>,
-                TinkerGraphVariables::class.java as Class<Any>,
-                MongoProperty::class.java as Class<Any>,
-                MongoVertexProperty::class.java as Class<Any>,
-                MongoGraph::class.java as Class<Any>
-        )
+                MongoEdge::class,
+                MongoVertex::class,
+                MongoElement::class,
+                TinkerGraphVariables::class,
+                MongoProperty::class,
+                MongoVertexProperty::class,
+                MongoGraph::class
+        ) as MutableSet<Class<Any>>
     }
 
     override fun getBaseConfiguration(graphName: String?, test: Class<*>?, testMethodName: String?, loadGraphWith: LoadGraphWith.GraphData?): MutableMap<String, Any> {
+        val resource = this::class.java.classLoader.getResource("graph.properties")
+        val stream = resource.openStream()
+        val props = Properties()
+        props.load(stream)
         return mutableMapOf(
                 Pair(Graph.GRAPH, MongoGraph::class.java.toString()),
-                Pair("connectionUrl", "mongodb+srv://tpop:TinkerPop3@cluster0-hakmv.mongodb.net/graph")
+                Pair("$MONGODB_CONFIG_PREFIX.connectionUrl", props.getProperty("$MONGODB_CONFIG_PREFIX.connectionUrl", "mongodb://localhost/test"))
         )
     }
 

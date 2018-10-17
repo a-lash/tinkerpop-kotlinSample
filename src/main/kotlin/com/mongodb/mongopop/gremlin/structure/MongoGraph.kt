@@ -42,8 +42,12 @@ class MongoGraph(val conf: Configuration) : Graph {
     internal val db: MongoDatabase
     private val variables: TinkerGraphVariables
 
+    companion object {
+        val MONGODB_CONFIG_PREFIX = "gremlin.mongodb"
+    }
+
     init {
-        val url = ConnectionString(conf.getString("connectionUrl"))
+        val url = ConnectionString(conf.getString("$MONGODB_CONFIG_PREFIX.connectionUrl"))
         client = MongoClients.create(url)
         db = client.getDatabase(url.database!!)
         vertices = db.getCollection("vertices")
@@ -107,7 +111,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     object MongoGraphFactory {
-        @JvmStatic
+        //@JvmStatic
         fun open(conf: Configuration): Graph {
             return MongoGraph(conf)
         }

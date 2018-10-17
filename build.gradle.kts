@@ -4,6 +4,11 @@ plugins {
     maven
 }
 
+group = "com.mongodb.mongopop"
+version = "1.0.0"
+
+apply(plugin="maven")
+
 val kotlinVersion: String by project
 val tinkerpopVersion: String by project
 val kmongoVersion: String by project
@@ -24,7 +29,3 @@ repositories {
     mavenCentral()
 }
 
-group = "com.mongodb.mongopop"
-version = "1.0.0"
-
-apply(plugin="maven")

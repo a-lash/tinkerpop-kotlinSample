@@ -67,14 +67,10 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     override fun addVertex(vararg keyValues: Any?): Vertex {
-        val d = Document()
-        keyValues.asList().chunked(2).forEach {
-            val key = it[0] as String
-            d.append(if (key == T.id.accessor) "_id" else key, it[1])
-        }
-        vertices.insertOne(d)
+        val mongoVertex = MongoVertex(this, keyValues)
+        mongoVertex.save()
 
-        return MongoVertex(d, this)
+        return mongoVertex
     }
 
     override fun configuration(): Configuration {

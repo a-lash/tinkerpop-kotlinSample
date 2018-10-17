@@ -44,7 +44,15 @@ class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, 
     }
 
     override fun vertices(direction: Direction?): MutableIterator<Vertex> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // TODO caching
+        val ans = mutableListOf<Vertex>()
+        if (direction == Direction.IN || direction == Direction.BOTH) {
+            ans.addAll(graph.vertices(this.document["inVertex"]).asSequence())
+        }
+        if (direction == Direction.OUT || direction == Direction.BOTH) {
+            ans.addAll(graph.vertices(this.document["outVertex"]).asSequence())
+        }
+        return ans.iterator()
     }
 
     override fun <V : Any?> property(key: String?, value: V): Property<V> {

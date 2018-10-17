@@ -30,6 +30,13 @@ import org.bson.Document
 import org.litote.kmongo.findOneById
 
 class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
+    constructor(graph: MongoGraph, vararg keyValues: Any?) : this(Document(), graph) {
+        keyValues.asList().chunked(2).forEach {
+            val key = it[0] as String
+            document.append(if (key == T.id.accessor) "_id" else key, it[1])
+        }
+    }
+
     override val collection: MongoCollection<Document>
         get() = graph.vertices
 
@@ -71,7 +78,9 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
 //        collection.findOneById(document.get("_id")!!).
     }
 
+    // returns all adjacent vertices
     override fun vertices(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Vertex> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val edgesIterator = edges(direction, *edgeLabels)
+        return edgesIterator.asSequence().map { it.outVertex() }.toMutableList().iterator()
     }
 }

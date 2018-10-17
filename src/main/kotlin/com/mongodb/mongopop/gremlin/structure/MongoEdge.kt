@@ -26,14 +26,14 @@ import org.bson.Document
 
 class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, graph), Edge {
 
-    constructor(label: String?, inVertex: Any, graph: MongoGraph, vararg keyValues: Any?): this(Document(), graph) {
+    constructor(label: String?, inVertex: Any, outVertex: Any, graph: MongoGraph, vararg keyValues: Any?): this(Document(), graph) {
         keyValues.asList().chunked(2).forEach {
-            val key = it[0] as String
+            val key = it[0].toString()
             document.append(if (key == T.id.accessor) "_id" else key, it[1])
         }
         document.set(T.label.accessor, label)
         document.set("inVertex", inVertex)
-        document.set("outVertex", this.id())
+        document.set("outVertex", outVertex)
 
     }
     override val collection: MongoCollection<Document>

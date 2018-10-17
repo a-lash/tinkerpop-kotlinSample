@@ -16,22 +16,39 @@
 
 package com.mongodb.mongopop.gremlin.structure
 
+import com.mongodb.ConnectionString
+import com.mongodb.client.MongoClients
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.AbstractGraphProvider
 import org.apache.tinkerpop.gremlin.LoadGraphWith
 import org.apache.tinkerpop.gremlin.structure.Graph
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraphVariables
 
 class MongoGraphProvider : AbstractGraphProvider() {
     override fun clear(graph: Graph?, configuration: Configuration?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val url = ConnectionString(configuration!!.getString("connectionUrl"))
+        val client = MongoClients.create(url)
+        val db = client.getDatabase(url.database!!)
+        db.drop()
     }
 
     override fun getImplementations(): MutableSet<Class<Any>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return mutableSetOf(
+                MongoEdge::class.java as Class<Any>,
+                MongoVertex::class.java as Class<Any>,
+                MongoElement::class.java as Class<Any>,
+                TinkerGraphVariables::class.java as Class<Any>,
+                MongoProperty::class.java as Class<Any>,
+                MongoVertexProperty::class.java as Class<Any>,
+                MongoGraph::class.java as Class<Any>
+        )
     }
 
     override fun getBaseConfiguration(graphName: String?, test: Class<*>?, testMethodName: String?, loadGraphWith: LoadGraphWith.GraphData?): MutableMap<String, Any> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return mutableMapOf(
+                Pair(Graph.GRAPH, MongoGraph::class.java.toString()),
+                Pair("connectionUrl", "mongodb+srv://tpop:TinkerPop3@cluster0-hakmv.mongodb.net/graph")
+        )
     }
 
 }

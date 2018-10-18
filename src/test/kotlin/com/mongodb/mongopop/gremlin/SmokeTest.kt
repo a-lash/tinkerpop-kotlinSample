@@ -51,8 +51,13 @@ class SmokeTest {
 
         println("Who are other guys except Anton who created the Mongopop?")
         val g = graph.traversal()
-        g.V().hasLabel("Anton").out("created").`in`("created").values<String>("label").forEach { println(it) }
-//        g.V().hasLabel("Anton").out("created").`in`("created").where(neq("exclude")).values<String>("name")
+        g.V().hasLabel("Anton").`as`("exclude")
+                .out("created")
+                .inE("created")
+                .inV()
+                .where(neq("exclude"))
+                .label()
+                .forEach { println(it) }
 
         /*g.V().hasLabel("Anton").forEach {
             println("id: ${it.id()} (${it.label()})")

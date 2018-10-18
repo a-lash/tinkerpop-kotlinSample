@@ -20,6 +20,7 @@ import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClients
 import com.mongodb.mongopop.gremlin.structure.MongoGraph
 import org.apache.commons.configuration.Configuration
+import org.apache.tinkerpop.gremlin.process.traversal.P.neq
 import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory
 import org.junit.Test
@@ -31,13 +32,21 @@ class SmokeTest {
     fun `should load some data in the graph`() {
         val graph = GraphFactory.open(this::class.java.classLoader.getResource("graph.properties").path)
         cleanup(graph.configuration())
-        val v1 = graph.addVertex("a")
-        val v2 = graph.addVertex(T.label, "b", "prop1", "1")
-        val v3 = graph.addVertex(T.label, "c", "prop1", "2")
+        val anton = graph.addVertex("Anton")
+        val asya = graph.addVertex("Asya")
+        val ross = graph.addVertex("Ross")
+        val jeff = graph.addVertex("Jeff")
+        val craig = graph.addVertex("Craig")
 
-        v1.addEdge("edge1", v2, "1", "one", "2", "two")
 
-        v2.addEdge("edge2", v3)
+        val mongopop = graph.addVertex(T.label, "Mongopop", "description", "Gremlin Graph query language implementation", "time spent", "2 days")
+
+        anton.addEdge("created", mongopop)
+        asya.addEdge("created", mongopop)
+        asya.addEdge("authored", mongopop, "motivation", "Many customers ask for MongoDB implementation for Gremlin")
+        ross.addEdge("created", mongopop)
+        jeff.addEdge("created", mongopop)
+        craig.addEdge("consulted", mongopop)
 
         val edges = graph.edges()
         println("Edges:")
@@ -49,21 +58,19 @@ class SmokeTest {
             }
         }
 
-        println("Vertices:")
+        println("Who are other guys except Anton who created the Mongopop?")
         val g = graph.traversal()
-        g.V().hasLabel("a", "b").forEach {
+        g.V().hasLabel("Anton").out("created").label().forEach { println(it) }
+//        g.V().hasLabel("Anton").out("created").`in`("created").where(neq("exclude")).values<String>("name")
+
+        /*g.V().hasLabel("Anton").forEach {
             println("id: ${it.id()} (${it.label()})")
             for (e in it.properties<Object>()) {
                 println("\t${e.key()} -> ${e.value()}")
             }
-        }
+        }*/
 
 
-        val vertices = graph.vertices(v1.id(), v2.id())
-        while (vertices.hasNext()) {
-            val v = vertices.next()
-            //      System.out.println(v.id() + " " + v.label());
-        }
     }
 
     fun cleanup(configuration: Configuration) {

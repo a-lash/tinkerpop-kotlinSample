@@ -24,6 +24,7 @@ import com.mongodb.client.model.Updates
 import org.apache.tinkerpop.gremlin.structure.*
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerVertexProperty
 import org.bson.Document
+import org.bson.types.ObjectId
 
 class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
     constructor(graph: MongoGraph, vararg keyValues: Any?) : this(Document(), graph) {
@@ -39,8 +40,9 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     override fun edges(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Edge> {
         // TODO direction
         // TODO move to MongoEdge
+        val labels = edgeLabels.toList()
         return graph.edges
-                .find(Filters.and(Filters.eq("inVertex", this.id()), Filters.`in`(T.label.accessor, edgeLabels)))
+                .find(Filters.and(Filters.eq("inVertex", ObjectId(this.id().toString())), Filters.`in`("label", labels)))
                 .map { MongoEdge(it, graph) }
                 .iterator()
     }
@@ -57,7 +59,7 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     }
 
     override fun addEdge(label: String?, inVertex: Vertex?, vararg keyValues: Any?): Edge {
-        val mongoEdge = MongoEdge(label, inVertex!!.id(), this.id(), graph, *keyValues)
+        val mongoEdge = MongoEdge(label, this.id(), inVertex!!.id(), graph, *keyValues)
         mongoEdge.save()
 
         return mongoEdge

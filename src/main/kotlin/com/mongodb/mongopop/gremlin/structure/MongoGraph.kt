@@ -111,7 +111,7 @@ class MongoGraph(val conf: Configuration) : Graph {
     }
 
     object MongoGraphFactory {
-        //@JvmStatic
+        @JvmStatic
         fun open(conf: Configuration): Graph {
             return MongoGraph(conf)
         }

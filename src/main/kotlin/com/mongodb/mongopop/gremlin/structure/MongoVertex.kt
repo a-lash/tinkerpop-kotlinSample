@@ -22,6 +22,7 @@ import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.ReturnDocument
 import com.mongodb.client.model.Updates
 import org.apache.tinkerpop.gremlin.structure.*
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerVertexProperty
 import org.bson.Document
 
 class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document, graph), Vertex {
@@ -45,11 +46,10 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
     }
 
     override fun <V : Any?> property(key: String?, value: V): VertexProperty<V> {
-        // TODO: REALLY!!!???
         document = collection.findOneAndUpdate(Filters.eq(document.get("_id")),
                 Updates.set(key!!, value),
                 FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER))!!
-        return MongoVertexProperty<V>()
+        return MongoVertexProperty<V>(this, key, value)
     }
 
     override fun remove() {
@@ -67,10 +67,9 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<VertexProperty<V>> {
-        // TODO properties are horrible
-        TODO("not implemented")
-//        collection.findOneById(document.get("_id")!!).
+    override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<MongoVertexProperty<V>> {
+        val document = collection.find(Filters.eq(document.get("_id"))).first()
+        return document.entries.filter { it.key != "_id" && it.key != "label"}.map { MongoVertexProperty(this, it.key, it.value as V) }.toMutableList().iterator()
     }
 
     // returns all adjacent vertices
@@ -78,4 +77,6 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
         val edgesIterator = edges(direction, *edgeLabels)
         return edgesIterator.asSequence().map { it.outVertex() }.toMutableList().iterator()
     }
+
+
 }

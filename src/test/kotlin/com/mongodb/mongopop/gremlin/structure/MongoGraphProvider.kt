@@ -24,6 +24,7 @@ import org.apache.tinkerpop.gremlin.AbstractGraphProvider
 import org.apache.tinkerpop.gremlin.LoadGraphWith
 import org.apache.tinkerpop.gremlin.structure.Graph
 import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraphVariables
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerProperty
 import java.util.*
 
 class MongoGraphProvider : AbstractGraphProvider() {
@@ -44,7 +45,7 @@ class MongoGraphProvider : AbstractGraphProvider() {
                 MongoVertex::class,
                 MongoElement::class,
                 TinkerGraphVariables::class,
-                MongoProperty::class,
+                TinkerProperty::class,
                 MongoVertexProperty::class,
                 MongoGraph::class
         ) as MutableSet<Class<Any>>

@@ -20,13 +20,29 @@ import org.apache.tinkerpop.gremlin.structure.Property
 import org.apache.tinkerpop.gremlin.structure.Vertex
 import org.apache.tinkerpop.gremlin.structure.VertexProperty
 
-class MongoVertexProperty<T>: MongoProperty<T>(), VertexProperty<T> {
-    override fun element(): Vertex {
+class MongoVertexProperty<T>(private val vertex: MongoVertex, private val key: String, private val value: T) : VertexProperty<T> {
+    override fun remove() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun value(): T {
+        return value
+    }
+
+    override fun isPresent(): Boolean {
+        return true
+    }
+
+    override fun key(): String {
+        return key
+    }
+
+    override fun element(): Vertex {
+        return vertex
+    }
+
     override fun id(): Any {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return ""
     }
 
     override fun <V : Any?> property(key: String?, value: V): Property<V> {

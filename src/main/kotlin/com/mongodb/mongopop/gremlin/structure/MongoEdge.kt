@@ -22,25 +22,29 @@ import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.ReturnDocument
 import com.mongodb.client.model.Updates
 import org.apache.tinkerpop.gremlin.structure.*
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerProperty
 import org.bson.Document
+import org.litote.kmongo.findOneById
 
 class MongoEdge(document: Document, graph: MongoGraph) : MongoElement(document, graph), Edge {
 
-    constructor(label: String?, inVertex: Any, outVertex: Any, graph: MongoGraph, vararg keyValues: Any?): this(Document(), graph) {
+    constructor(label: String?, inVertex: Any, outVertex: Any, graph: MongoGraph, vararg keyValues: Any?) : this(Document(), graph) {
         keyValues.asList().chunked(2).forEach {
             val key = it[0].toString()
             document.append(if (key == T.id.accessor) "_id" else key, it[1])
         }
-        document.set(T.label.accessor, label)
+        document.set(T.label.toString(), label)
         document.set("inVertex", inVertex)
         document.set("outVertex", outVertex)
 
     }
+
     override val collection: MongoCollection<Document>
         get() = graph.edges
 
-    override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<Property<V>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<TinkerProperty<V>> {
+        val document = collection.find(Filters.eq(document.get("_id"))).first()
+        return document.entries.filter { it.key != "_id" && it.key != "label" && it.key != "inVertex" && it.key != "outVertex"}.map { TinkerProperty(this, it.key, it.value as V) }.toMutableList().iterator()
     }
 
     override fun vertices(direction: Direction?): MutableIterator<Vertex> {

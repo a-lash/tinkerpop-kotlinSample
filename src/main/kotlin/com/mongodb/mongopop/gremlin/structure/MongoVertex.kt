@@ -38,13 +38,30 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
         get() = graph.vertices
 
     override fun edges(direction: Direction?, vararg edgeLabels: String?): MutableIterator<Edge> {
-        // TODO direction
-        // TODO move to MongoEdge
+        if (edgeLabels.size == 0) {
+            return graph.edges
+                    .find(Filters.eq("inVertex", ObjectId(this.id().toString())))
+                    .map { MongoEdge(it, graph) }
+                    .iterator()
+        }
         val labels = edgeLabels.toList()
+        val ans = mutableListOf<Edge>()
+        if (direction == Direction.IN || direction == Direction.BOTH) {
+            ans.addAll(graph.edges
+                    .find(Filters.and(Filters.eq("outVertex", ObjectId(this.id().toString())), Filters.`in`("label", labels)))
+                    .map { MongoEdge(it, graph) })
+        }
+        if (direction == Direction.OUT || direction == Direction.BOTH) {
+            ans.addAll(graph.edges
+                    .find(Filters.and(Filters.eq("inVertex", ObjectId(this.id().toString())), Filters.`in`("label", labels)))
+                    .map { MongoEdge(it, graph) })
+        }
+        return ans.toMutableList().iterator()
+        /*// TODO move to MongoEdge
         return graph.edges
                 .find(Filters.and(Filters.eq("inVertex", ObjectId(this.id().toString())), Filters.`in`("label", labels)))
                 .map { MongoEdge(it, graph) }
-                .iterator()
+                .iterator()*/
     }
 
     override fun <V : Any?> property(key: String?, value: V): VertexProperty<V> {

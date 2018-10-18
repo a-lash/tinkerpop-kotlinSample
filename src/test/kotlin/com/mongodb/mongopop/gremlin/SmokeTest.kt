@@ -48,19 +48,10 @@ class SmokeTest {
         jeff.addEdge("created", mongopop)
         craig.addEdge("consulted", mongopop)
 
-        val edges = graph.edges()
-        println("Edges:")
-        while (edges.hasNext()) {
-            val edge = edges.next()
-            println("id: ${edge.id()} (${edge.label()}), from ${edge.outVertex().label()}, to ${edge.inVertex().label()}")
-            for (e in edge.properties<Object>()) {
-                println("\t${e.key()} -> ${e.value()}")
-            }
-        }
 
         println("Who are other guys except Anton who created the Mongopop?")
         val g = graph.traversal()
-        g.V().hasLabel("Anton").out("created").label().forEach { println(it) }
+        g.V().hasLabel("Anton").out("created").`in`("created").values<String>("label").forEach { println(it) }
 //        g.V().hasLabel("Anton").out("created").`in`("created").where(neq("exclude")).values<String>("name")
 
         /*g.V().hasLabel("Anton").forEach {
@@ -71,6 +62,15 @@ class SmokeTest {
         }*/
 
 
+        val edges = graph.edges()
+        println("Edges:")
+        while (edges.hasNext()) {
+            val edge = edges.next()
+            println("id: ${edge.id()} (${edge.label()}), from ${edge.outVertex().label()}, to ${edge.inVertex().label()}")
+            for (e in edge.properties<Object>()) {
+                println("\t${e.key()} -> ${e.value()}")
+            }
+        }
     }
 
     fun cleanup(configuration: Configuration) {

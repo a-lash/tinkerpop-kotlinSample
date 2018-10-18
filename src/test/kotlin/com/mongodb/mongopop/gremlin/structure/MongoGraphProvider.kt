@@ -55,7 +55,7 @@ class MongoGraphProvider : AbstractGraphProvider() {
         val props = Properties()
         props.load(stream)
 
-        val configuration = mutableMapOf<String, Any>(Pair(Graph.GRAPH, MongoGraph::class.java.toString()))
+        val configuration = mutableMapOf<String, Any>(Pair(Graph.GRAPH, MongoGraph::class.java.name))
         props.keys.filter { (it as String).startsWith(MONGODB_CONFIG_PREFIX) }.forEach{
             configuration.put(it as String, props.getProperty(it))
         }

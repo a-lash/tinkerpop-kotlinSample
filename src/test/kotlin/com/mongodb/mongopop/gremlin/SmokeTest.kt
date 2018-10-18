@@ -61,7 +61,7 @@ class SmokeTest {
 
 
         val g2 = graph.traversal()
-        g2.V().hasLabel("Mongopop").values<String>("description").forEach { println(it) }
+        g2.V().hasLabel("Mongopop").values<String>().forEach { println(it) }
 
         /*g.V().hasLabel("Anton").forEach {
             println("id: ${it.id()} (${it.label()})")

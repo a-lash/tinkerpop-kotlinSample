@@ -23,8 +23,6 @@ import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.structure.T
 import org.apache.tinkerpop.gremlin.structure.util.GraphFactory
 import org.junit.Test
-import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource
-
 
 
 class SmokeTest {
@@ -71,9 +69,7 @@ class SmokeTest {
     fun cleanup(configuration: Configuration) {
         val url = ConnectionString(configuration.getString("${MongoGraph.MONGODB_CONFIG_PREFIX}.connectionUrl"))
         val client = MongoClients.create(url)
-        val db = client.getDatabase(url.database!!)
-        for (collection in db.listCollectionNames()) {
-            db.getCollection(collection).drop()
-        }
+        client.getDatabase(url.database!!).drop()
+        client.close()
     }
 }

@@ -21,7 +21,6 @@ dependencies {
 
     testApi("org.apache.tinkerpop:gremlin-test:$tinkerpopVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("junit:junit:$junitVersion")
 }
 
 repositories {

@@ -34,7 +34,7 @@ import org.bson.Document
 import org.bson.types.ObjectId
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
-@GraphFactoryClass(MongoGraph.MongoGraphFactory::class)
+@GraphFactoryClass(MongoGraph.Companion::class)
 class MongoGraph(val conf: Configuration) : Graph {
     private val client: MongoClient
     internal val vertices: MongoCollection<Document>
@@ -44,6 +44,11 @@ class MongoGraph(val conf: Configuration) : Graph {
 
     companion object {
         val MONGODB_CONFIG_PREFIX = "gremlin.mongodb"
+
+        @JvmStatic
+        fun open(conf: Configuration): Graph {
+            return MongoGraph(conf)
+        }
     }
 
     init {
@@ -108,13 +113,6 @@ class MongoGraph(val conf: Configuration) : Graph {
 
     override fun tx(): Transaction {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    object MongoGraphFactory {
-        @JvmStatic
-        fun open(conf: Configuration): Graph {
-            return MongoGraph(conf)
-        }
     }
 
 }

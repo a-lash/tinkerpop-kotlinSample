@@ -32,10 +32,8 @@ class MongoGraphProvider : AbstractGraphProvider() {
     override fun clear(graph: Graph?, configuration: Configuration?) {
         val url = ConnectionString(configuration!!.getString("$MONGODB_CONFIG_PREFIX.connectionUrl"))
         val client = MongoClients.create(url)
-        val db = client.getDatabase(url.database!!)
-        for (collection in db.listCollectionNames()) {
-            db.getCollection(collection).drop()
-        }
+        client.getDatabase(url.database!!).drop()
+        client.close()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -56,10 +54,12 @@ class MongoGraphProvider : AbstractGraphProvider() {
         val stream = resource.openStream()
         val props = Properties()
         props.load(stream)
-        return mutableMapOf(
-                Pair(Graph.GRAPH, MongoGraph::class.java.toString()),
-                Pair("$MONGODB_CONFIG_PREFIX.connectionUrl", props.getProperty("$MONGODB_CONFIG_PREFIX.connectionUrl", "mongodb://localhost/test"))
-        )
-    }
+
+        val configuration = mutableMapOf<String, Any>(Pair(Graph.GRAPH, MongoGraph::class.java.toString()))
+        props.keys.filter { (it as String).startsWith(MONGODB_CONFIG_PREFIX) }.forEach{
+            configuration.put(it as String, props.getProperty(it))
+        }
+        return configuration
+   }
 
 }

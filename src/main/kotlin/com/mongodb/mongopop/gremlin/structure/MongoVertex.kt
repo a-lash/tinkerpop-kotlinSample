@@ -88,7 +88,9 @@ class MongoVertex(document: Document, graph: MongoGraph) : MongoElement(document
 
     override fun <V : Any?> properties(vararg propertyKeys: String?): MutableIterator<MongoVertexProperty<V>> {
         val document = collection.find(Filters.eq(document.get("_id"))).first()
-        return document.entries.filter { it.key != "_id" && it.key != "label"}.map { MongoVertexProperty(this, it.key, it.value as V) }.toMutableList().iterator()
+        return document.entries.filter { it.key != "_id" && it.key != "label" && it.key in propertyKeys}
+                .map { MongoVertexProperty(this, it.key, it.value as V) }
+                .toMutableList().iterator()
     }
 
     // returns all adjacent vertices

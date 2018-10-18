@@ -56,8 +56,12 @@ class SmokeTest {
                 .inE("created")
                 .inV()
                 .where(neq("exclude"))
-                .label()
+                .values<String>("motivation")
                 .forEach { println(it) }
+
+
+        val g2 = graph.traversal()
+        g2.V().hasLabel("Mongopop").values<String>("description").forEach { println(it) }
 
         /*g.V().hasLabel("Anton").forEach {
             println("id: ${it.id()} (${it.label()})")
@@ -69,13 +73,13 @@ class SmokeTest {
 
         val edges = graph.edges()
         println("Edges:")
-        while (edges.hasNext()) {
+/*        while (edges.hasNext()) {
             val edge = edges.next()
             println("id: ${edge.id()} (${edge.label()}), from ${edge.outVertex().label()}, to ${edge.inVertex().label()}")
             for (e in edge.properties<Object>()) {
                 println("\t${e.key()} -> ${e.value()}")
             }
-        }
+        }*/
     }
 
     fun cleanup(configuration: Configuration) {

@@ -22,6 +22,7 @@ import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
+import com.mongodb.mongopop.gremlin.MongoGraphFactory
 import org.apache.commons.configuration.Configuration
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer
 import org.apache.tinkerpop.gremlin.structure.Edge
@@ -34,7 +35,7 @@ import org.bson.Document
 import org.bson.types.ObjectId
 
 @Graph.OptIn(Graph.OptIn.SUITE_STRUCTURE_STANDARD)
-@GraphFactoryClass(MongoGraph.Companion::class)
+@GraphFactoryClass(MongoGraphFactory::class)
 class MongoGraph(val conf: Configuration) : Graph {
     private val client: MongoClient
     internal val vertices: MongoCollection<Document>
@@ -44,11 +45,6 @@ class MongoGraph(val conf: Configuration) : Graph {
 
     companion object {
         val MONGODB_CONFIG_PREFIX = "gremlin.mongodb"
-
-        @JvmStatic
-        fun open(conf: Configuration): Graph {
-            return MongoGraph(conf)
-        }
     }
 
     init {
